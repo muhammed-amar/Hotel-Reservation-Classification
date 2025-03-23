@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Forest Classifier</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-image: url('https://img.freepik.com/free-photo/beautiful-tropical-beach-front-hotel-resort-with-swimming-pool-paradise-destination-vacations-generative-ai-illustration_1258-151618.jpg?t=st=1714513835~exp=1714517435~hmac=5ff2b38fb85205ff14de1f8a8992e1f25be911340773ca18e7f03172c05a2215&w=1380'); /* URL of your image */
+      background-size: cover; /* Cover the entire area */
+      background-repeat: no-repeat; /* Prevent repetition */
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      
+    }
+
+    .login {
+      width: 800px;
+      margin: 70px auto;
+      background-color: #ffffff;
+      /* backdrop-filter: blur(2.5px); */
+      padding: 30px;
+      border-radius: 10px;
+      /* border: 8px solid #3876BF;  */
+      box-shadow: #999;
+    }
+
+    h1 {
+      text-align: center;
+      color: #286b77; /* اللون الأخضر */
+      transition: all 2s ease;
+      
+    }
+    h1:hover {
+            transform: scale(1.2);
+            color:#286b77;
+        }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 15px;
+    }
+
+    label {
+  color: #286b77;
+  margin-bottom: 5px; /* تقريب العناصر */
+  display: block;
+  font-size: 22px;
+  font-weight: bold;
+  transition: all 1s ease;
+  padding: 25px;
+}
+
+    label:hover {
+    transform: scale(1.2);
+
+}
+
+    input,
+    select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 2px solid #286b77;
+            border-radius: 5px;
+            color: #286b77;
+            font-size: 18px;
+            font-weight: bold;
+            min-width: 150px;
+            max-width: 300px;
+            resize: none;
+            transition: all 1s ease;
+    }
+    button {
+            width: 100%;
+            padding: 12px 24px;
+            margin: 3px;
+            background-color: #286b77;
+            color: #ffffff;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: all 1s ease;
+            font-weight: bold;
+
+        }
+
+        button:hover {
+            transform: scale(1.051);
+
+        }
+
+    .norm{      
+      font-style: initial;
+      color: #286b77;
+      margin-top: 20px;
+      padding: 15px;
+      text-align: center;
+      font-weight: bold;
+      font-size: x-large;}
+.red {      
+      font-style: initial;
+      margin-top: 50px;
+      color: rgb(177, 6, 6);
+      text-align: center;
+      font-weight: bold;
+      font-size: x-large;
+      transition: all 2.5s ease; }
+.green {      
+      font-style: initial;
+      margin-top: 50px;
+      color: #286b77;
+      text-align: center;
+      font-weight: bold;
+      font-size: x-large;
+      transition: all 2.5s ease;}
+
+.red:hover {
+       transform: scale(1.25);     
+        }
+.green:hover {
+       transform: scale(1.25);     
+        }
+  </style>
+
+  
+  <div class="login">
+    <h1>Booking predictor </h1>
+    <form id="prediction_form" action="/predict" method="post">
+      <label for="meal">Meal:</label>
+      <select name="meal" id="meal" required>
+        <option value="2" label="Not Selected">Not Selected</option>
+        <option value="0" label="Meal Plan 1">Meal Plan 1</option>
+        <option value="1" label="Meal Plan 2">Meal Plan 2</option>
+      </select>
+  
+      <label for="parking">Parking:</label>
+      <select name="parking" id="parking" required>
+        <option value="1" label="Yes">Yes</option>
+        <option value="0" label="No">No</option>
+      </select>
+  
+      <label for="room_type">Room Type:</label>
+      <select name="room_type" id="room_type" required>
+        <option value="0" label="Room_Type 1">Room_Type 1</option>
+        <option value="2" label="Room_Type 4">Room_Type 4</option>
+        <option value="3" label="Room_Type 5">Room_Type 5</option>
+        <option value="4" label="Room_Type 6">Room_Type 6</option>
+        <option value="1" label="Room_Type 2">Room_Type 2</option>
+        <option value="5" label="Room_Type 7">Room_Type 7</option>
+      </select>
+  
+      <label for="lead_time">Lead Time:</label>
+      <input type="number" name="lead_time" required>
+  
+      <label for="market">Market:</label>
+      <select name="market" id="market" required>
+        <option value="2" label="Online">Online</option>
+        <option value="1" label="Offline">Offline</option>
+        <option value="0" label="Corporate">Corporate</option>
+      </select>
+  
+      <label for="repeated">Repeated:</label>
+      <input type="number" name="repeated" required>
+  
+      <label for="canceled_book">Canceled Book:</label>
+      <input type="number" name="canceled_book" required>
+  
+      <label for="price">Price:</label>
+      <input type="number" name="price" required>
+  
+      <label for="special_requests">Special Requests:</label>
+      <input type="number" name="special_requests" required>
+  
+      <label for="num_of_people">Number of People:</label>
+      <input type="number" name="num_of_people" required>
+  
+      <label for="nights">Nights:</label>
+      <input type="number" name="nights" required>
+  
+      <button type="button" onclick="predict();">Predict</button>
+      <button type="button" onclick="resetForm();">Reset Form</button>
+    </form>
+    <div id="prediction_result" class="norm"><p>look here after prediction 👀</p></div>
+  </div> 
+  <script>
+    function changeColor() {
+      var header = document.getElementById('prediction_result');
+      if (header.innerHTML == 'Canceled 🤬') {
+        header.className = 'red';
+      } else if (header.innerHTML == 'Not Canceled 😇') {
+        header.className = 'green';
+      }
+    }
+  
+    function resetForm() {
+      var form = document.getElementById("prediction_form");
+      var inputs = form.querySelectorAll("input, select");
+  
+      // التحقق من أن الحقول ليست فارغة
+      var isEmpty = Array.from(inputs).some(input => input.value.trim() !== '');
+  
+      // إذا كانت الحقول فارغة، لا تقم بإعادة تعيين النموذج
+      if (!isEmpty) {
+        return;
+      }
+  
+      form.reset();
+      document.getElementById('prediction_result').innerHTML = '<p>look here after prediction 👀</p>';
+        // Resetting the class value to 'norm'
+        document.getElementById('prediction_result').className = 'norm';
+
+    }
+  
+    function predict() {
+      var form = document.getElementById("prediction_form");
+  
+      // التحقق من صحة البيانات في النموذج
+      if (!form.checkValidity()) {
+        // إذا كان هناك حقول مفقودة، فلا تقم بإرسال النموذج
+        return;
+      }
+  
+      var formData = new FormData(form);
+  
+      fetch("/predict", {
+          method: "POST",
+          body: formData
+        })
+        .then(response => response.text())
+        .then(prediction => {
+          document.getElementById("prediction_result").innerHTML = prediction;
+          changeColor()
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    }
+  </script>
+  
+  
+  
+</body>
+
+</html>
